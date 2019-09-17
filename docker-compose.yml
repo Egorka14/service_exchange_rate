@@ -1,0 +1,52 @@
+version: '3'
+services:
+    apache:
+        build: .docker/apache
+        container_name: exchange_rate_service_apache
+        ports:
+          - 80:80
+        volumes:
+          - .docker/config/vhosts:/etc/apache2/sites-enabled
+          - .:/
+        depends_on:
+          - php
+
+    mysql:
+        image: mysql
+        command: "--default-authentication-plugin=mysql_native_password"
+        container_name: exchange_rate_service_mysql
+        volumes:
+            - .docker/data/db:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: exchange_rate_service
+            MYSQL_USER: mysql
+            MYSQL_PASSWORD: mysql
+
+    php:
+        build: .docker/php
+        container_name: exchange_rate_service_php
+        volumes:
+          - .:/
+        environment:
+          - maildev_host=exchange_rate_service_maildev
+        depends_on:
+          - maildev
+          - mysql
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: exchange_rate_service_phpmyadmin
+        environment:
+          PMA_HOST: mysql
+          PMA_PORT: 3306
+        ports:
+            - 8080:80
+        links:
+            - mysql
+
+    maildev:
+        image: djfarrelly/maildev
+        container_name: exchange_rate_service_maildev
+        ports:
+          - 8001:80

@@ -1,0 +1,22 @@
+
+{% block body %}
+
+    <div>
+
+        {% for value in res %}
+            <p>На: {{ value.dateCurrency| date('Y-m-d') }}</p>
+<table>
+            {% for content in value.content %}
+    <tr><td>      {{ content.CharCode[0] }} </td>
+        <td>  {{ content.Name[0] }} </td>
+        <td>  {{ content.Rate[0] }} </td>
+    </tr>
+
+            {% endfor %}
+</table>
+
+        {% endfor %}
+
+    </div>
+
+{% endblock %}
